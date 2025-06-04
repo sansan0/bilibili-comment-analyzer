@@ -1,0 +1,62 @@
+name: Release
+permissions:
+  contents: write
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    name: 构建Windows可执行文件
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+      
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install
+      
+      - name: 获取版本号
+        id: get_version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      
+      - name: 构建可执行文件
+        env:
+          PYTHONIOENCODING: utf-8
+        run: poetry run cxfreeze build
+      
+      - name: 创建ZIP压缩包
+        run: |
+          # 创建英文名文件夹
+          New-Item -ItemType Directory -Force -Path "bilibili-comment-analyzer_v${{ env.VERSION }}"
+          # 复制构建文件到文件夹中
+          Copy-Item -Path "build/exe.win-*/*" -Destination "bilibili-comment-analyzer_v${{ env.VERSION }}/" -Recurse
+          # 压缩为中文名的zip文件
+          Compress-Archive -Path "bilibili-comment-analyzer_v${{ env.VERSION }}" -DestinationPath "bilibili-comment-analyzer_v${{ env.VERSION }}_windows.zip"
+      
+      - name: 创建Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: 哔哩哔哩评论观察者 v${{ env.VERSION }}
+          body: |
+            ### 📥 下载使用
+            
+            点击下方附件下载应用程序，解压后双击文件夹内的 `哔哩哔哩评论观察者.exe` 即可运行。
+          draft: false
+          prerelease: false
+          files: |
+            bilibili-comment-analyzer_v${{ env.VERSION }}_windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

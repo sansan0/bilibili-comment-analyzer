@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .Title }} 评论地区分布</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh;
+        background: #f0f0f0;
+      }
+
+      .info-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+        z-index: 1000;
+        min-width: 200px;
+      }
+
+      .info-panel h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .info-panel .info-row {
+        margin: 4px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .info-panel .label {
+        color: #666;
+      }
+
+      .info-panel .value {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .info-panel .divider {
+        height: 1px;
+        background: #e0e0e0;
+        margin: 8px 0;
+      }
+
+      .legend {
+        position: absolute;
+        bottom: 20px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        font-size: 12px;
+        z-index: 1000;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 4px 0;
+      }
+
+      .legend-color {
+        width: 20px;
+        height: 12px;
+        margin-right: 6px;
+        border: 1px solid #ccc;
+      }
+
+      .tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        pointer-events: none;
+        z-index: 1001;
+        display: none;
+      }
+
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        font-size: 16px;
+        z-index: 1002;
+      }
+
+      .error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid #ff0000;
+        padding: 20px;
+        border-radius: 8px;
+        color: #cc0000;
+        font-size: 16px;
+        z-index: 1002;
+        max-width: 400px;
+        text-align: center;
+      }
+      path.leaflet-interactive:focus {
+        outline: 2px dashed rgba(108, 117, 125, 0.5);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div class="info-panel">
+      <h3>{{ .Title }}</h3>
+      <div class="divider"></div>
+      <div id="hover-info" style="display: none">
+        <div class="info-row">
+          <span class="label">地区:</span>
+          <span class="value" id="region-name">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">评论数:</span>
+          <span class="value" id="comment-count">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">用户数:</span>
+          <span class="value" id="user-count">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">点赞数:</span>
+          <span class="value" id="like-count">-</span>
+        </div>
+        <div class="divider"></div>
+        <div class="info-row">
+          <span class="label">性别分布:</span>
+        </div>
+        <div class="info-row" style="font-size: 12px">
+          <span>男: <span id="male-count">-</span></span>
+          <span>女: <span id="female-count">-</span></span>
+          <span>保密: <span id="sexless-count">-</span></span>
+        </div>
+      </div>
+      <div id="default-info">
+        <div class="info-row">
+          <span class="label">鼠标悬停查看详情</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="legend" class="legend">
+      <!-- 图例将由JavaScript动态生成 -->
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+    <div id="loading" class="loading" style="display: none">
+      正在加载地图数据...
+    </div>
+    <div id="error" class="error" style="display: none"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // 全局变量
+      let geojson;
+      let colorBreaks = []; // 动态计算的颜色分层断点
+      let colorScheme = [
+        "#fff",
+        "#fff076",
+        "#fed976",
+        "#feb24c",
+        "#fd8d3c",
+        "#f03b20",
+      ]; // 颜色方案
+      let currentHighlightLayer = null; // 当前高亮的图层
+
+      // 预设的断点候选值
+      const CANDIDATE_BREAKS = [
+        1, 2, 5, 10, 15, 20, 30, 50, 80, 100, 150, 200, 300, 500, 800, 1000,
+        1500, 2000, 3000, 5000, 8000, 10000, 15000, 20000, 30000, 50000, 100000,
+      ];
+
+      // 初始化地图
+      const map = L.map("map", {
+        center: [35.8617, 104.1954], // 中国中心点
+        zoom: 5,
+        minZoom: 4,
+        maxZoom: 7,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      // 添加底图
+      L.tileLayer(
+        "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+        {
+          subdomains: "1234",
+          attribution: "© 高德地图",
+          maxZoom: 18,
+        }
+      ).addTo(map);
+
+      /**
+       * 基于预设断点和实际数据分布计算颜色分层
+       */
+      function calculateColorBreaks(values) {
+        if (!values || values.length === 0) {
+          return [];
+        }
+
+        const nonZeroValues = [...new Set(values.filter((v) => v > 0))].sort(
+          (a, b) => a - b
+        );
+
+        if (nonZeroValues.length === 0) {
+          return [];
+        }
+
+        const min = nonZeroValues[0];
+        const max = nonZeroValues[nonZeroValues.length - 1];
+        const uniqueCount = nonZeroValues.length;
+
+        console.log(
+          `数据分析: 最小值=${min}, 最大值=${max}, 不同数值个数=${uniqueCount}`
+        );
+        console.log("所有不同的数值:", nonZeroValues);
+
+        // 极端情况：所有值都相同或只有2个不同值
+        if (min === max || uniqueCount <= 2) {
+          console.log("数据值太少或相同，不设置断点");
+          return [];
+        }
+
+        // 从候选断点中筛选适合的断点
+        const suitableCandidates = CANDIDATE_BREAKS.filter(
+          (candidate) => candidate >= min && candidate < max
+        );
+
+        console.log("候选断点:", suitableCandidates);
+
+        if (suitableCandidates.length === 0) {
+          console.log("没有合适的候选断点");
+          return [];
+        }
+
+        // 计算每个候选断点的"有效性"
+        const breakScores = suitableCandidates.map((candidate) => {
+          const countBelow = nonZeroValues.filter((v) => v <= candidate).length;
+          const countAbove = nonZeroValues.filter((v) => v > candidate).length;
+
+          const balance =
+            Math.min(countBelow, countAbove) / Math.max(countBelow, countAbove);
+          const coverage = (countBelow + countAbove) / nonZeroValues.length;
+
+          return {
+            value: candidate,
+            score: balance * coverage,
+            countBelow,
+            countAbove,
+          };
+        });
+
+        breakScores.sort((a, b) => b.score - a.score);
+        console.log("断点评分:", breakScores);
+
+        // 选择最佳断点
+        const selectedBreaks = [];
+        const maxBreaks = Math.min(4, colorScheme.length - 2); // 最多4个断点，确保有足够颜色
+
+        for (let i = 0; i < Math.min(maxBreaks, breakScores.length); i++) {
+          const candidate = breakScores[i];
+
+          if (candidate.countBelow >= 1 && candidate.countAbove >= 1) {
+            selectedBreaks.push(candidate.value);
+          }
+
+          if (selectedBreaks.length >= maxBreaks) {
+            break;
+          }
+        }
+
+        selectedBreaks.sort((a, b) => a - b);
+
+        console.log("最终选择的断点:", selectedBreaks);
+        return selectedBreaks;
+      }
+
+      /**
+       * 根据数值和断点返回对应颜色
+       * @param {number} value - 数值
+       * @returns {string} 颜色值
+       */
+      function getColor(value) {
+        // 调试信息
+        console.log(
+          `计算颜色: value=${value}, colorBreaks=${JSON.stringify(colorBreaks)}`
+        );
+
+        if (value === 0) {
+          console.log(`返回无数据颜色: ${colorScheme[0]}`);
+          return colorScheme[0]; // 无数据 - 白色/灰色
+        }
+
+        if (colorBreaks.length === 0) {
+          // 没有断点，所有非零值使用第二种颜色
+          console.log(`无断点，返回统一颜色: ${colorScheme[1]}`);
+          return colorScheme[1];
+        }
+
+        // 根据断点确定颜色索引
+        let colorIndex = 1; // 从第二种颜色开始（索引1）
+
+        // 遍历断点，找到合适的颜色索引
+        for (let i = 0; i < colorBreaks.length; i++) {
+          if (value <= colorBreaks[i]) {
+            colorIndex = i + 1; // 第i个断点对应第i+1种颜色（跳过无数据颜色）
+            break;
+          } else {
+            colorIndex = i + 2; // 如果超过第i个断点，至少使用第i+2种颜色
+          }
+        }
+
+        // 确保不超出颜色数组范围
+        colorIndex = Math.min(colorIndex, colorScheme.length - 1);
+
+        const selectedColor = colorScheme[colorIndex];
+        console.log(
+          `value=${value}, colorIndex=${colorIndex}, selectedColor=${selectedColor}`
+        );
+
+        return selectedColor;
+      }
+
+      /**
+       * 动态生成图例
+       */
+      function generateLegend() {
+        const legendDiv = document.getElementById("legend");
+        legendDiv.innerHTML = "";
+
+        // 添加无数据项
+        const noDataItem = document.createElement("div");
+        noDataItem.className = "legend-item";
+        noDataItem.innerHTML = `
+          <div class="legend-color" style="background: ${colorScheme[0]};"></div>
+          <span>无数据</span>
+        `;
+        legendDiv.appendChild(noDataItem);
+
+        if (colorBreaks.length === 0) {
+          const singleItem = document.createElement("div");
+          singleItem.className = "legend-item";
+          singleItem.innerHTML = `
+            <div class="legend-color" style="background: ${colorScheme[1]};"></div>
+            <span>有数据</span>
+          `;
+          legendDiv.appendChild(singleItem);
+          return;
+        }
+
+        // 生成图例项
+        for (let i = 0; i < colorBreaks.length + 1; i++) {
+          const item = document.createElement("div");
+          item.className = "legend-item";
+
+          let label;
+          let colorIndex = i + 1; // 跳过无数据颜色
+
+          if (i === 0) {
+            label = `1-${colorBreaks[0]} 条`;
+          } else if (i === colorBreaks.length) {
+            label = `${colorBreaks[i - 1] + 1}+ 条`;
+          } else {
+            label = `${colorBreaks[i - 1] + 1}-${colorBreaks[i]} 条`;
+          }
+
+          const color =
+            colorScheme[Math.min(colorIndex, colorScheme.length - 1)];
+
+          item.innerHTML = `
+            <div class="legend-color" style="background: ${color};"></div>
+            <span>${label}</span>
+          `;
+
+          legendDiv.appendChild(item);
+        }
+
+        console.log("图例已生成");
+      }
+
+      // 样式函数
+      function style(feature) {
+        const count = feature.properties.count || 0;
+        return {
+          fillColor: getColor(count),
+          weight: 1,
+          opacity: 1,
+          color: "#666",
+          fillOpacity: 0.7,
+        };
+      }
+
+      // 重置所有图层为正常状态
+      function resetAllLayers() {
+        if (geojson) {
+          geojson.eachLayer(function (layer) {
+            geojson.resetStyle(layer);
+          });
+        }
+        currentHighlightLayer = null;
+      }
+
+      // 高亮特定图层，其他图层变淡
+      function highlightFeature(e) {
+        const layer = e.target;
+
+        // 重置之前的高亮
+        resetAllLayers();
+
+        // 让所有图层变淡
+        geojson.eachLayer(function (otherLayer) {
+          if (otherLayer !== layer) {
+            otherLayer.setStyle({
+              fillOpacity: 0.3,
+              opacity: 0.5,
+            });
+          }
+        });
+
+        // 高亮当前图层 - 明确指定边框样式，避免默认黑色
+        layer.setStyle({
+          fillOpacity: 0.9,
+          opacity: 1,
+          weight: 1, // 保持原有边框宽度
+          color: "#666", // 保持原有灰色边框
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+
+        currentHighlightLayer = layer;
+        updateInfo(layer.feature.properties);
+      }
+
+      // 重置高亮样式
+      function resetHighlight(e) {
+        resetAllLayers();
+        document.getElementById("hover-info").style.display = "none";
+        document.getElementById("default-info").style.display = "block";
+      }
+
+      // 更新信息面板
+      function updateInfo(props) {
+        document.getElementById("hover-info").style.display = "block";
+        document.getElementById("default-info").style.display = "none";
+
+        document.getElementById("region-name").textContent = props.name || "-";
+        document.getElementById("comment-count").textContent = props.count || 0;
+        document.getElementById("user-count").textContent = props.users || 0;
+        document.getElementById("like-count").textContent = props.like || 0;
+        document.getElementById("male-count").textContent = props.male || 0;
+        document.getElementById("female-count").textContent = props.female || 0;
+        document.getElementById("sexless-count").textContent =
+          props.sexless || 0;
+      }
+
+      // 点击事件
+      function zoomToFeature(e) {
+        const layer = e.target;
+
+        // 重置所有图层
+        resetAllLayers();
+
+        // 让所有其他图层变淡
+        geojson.eachLayer(function (otherLayer) {
+          if (otherLayer !== layer) {
+            otherLayer.setStyle({
+              fillOpacity: 0.3,
+              opacity: 0.5,
+            });
+          }
+        });
+
+        // 高亮当前点击的图层 - 明确指定边框样式
+        layer.setStyle({
+          fillOpacity: 0.9,
+          opacity: 1,
+          weight: 1, // 保持原有边框宽度
+          color: "#666", // 保持原有灰色边框
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+
+        currentHighlightLayer = layer;
+        updateInfo(layer.feature.properties);
+
+        // 获取地区边界并调整地图视图
+        const bounds = layer.getBounds();
+        map.fitBounds(bounds, {
+          padding: [20, 20],
+          maxZoom: 7,
+        });
+      }
+
+      // 为每个要素添加事件
+      function onEachFeature(feature, layer) {
+        layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight,
+          click: zoomToFeature,
+        });
+
+        // 添加悬停提示
+        layer.bindTooltip(
+          feature.properties.name +
+            "<br/>评论数: " +
+            (feature.properties.count || 0),
+          {
+            permanent: false,
+            direction: "top",
+            className: "leaflet-tooltip",
+          }
+        );
+      }
+
+      // 显示加载提示
+      function showLoading() {
+        document.getElementById("loading").style.display = "block";
+      }
+
+      // 隐藏加载提示
+      function hideLoading() {
+        document.getElementById("loading").style.display = "none";
+      }
+
+      // 显示错误信息
+      function showError(message) {
+        const errorDiv = document.getElementById("error");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+      }
+
+      // 隐藏错误信息
+      function hideError() {
+        document.getElementById("error").style.display = "none";
+      }
+
+      // 异步加载GeoJSON数据
+      async function loadGeoJsonData() {
+        const geoJsonFile = "{{ .GeoJsonFile }}";
+
+        if (!geoJsonFile || geoJsonFile === "") {
+          showError("GeoJSON文件名未指定");
+          return;
+        }
+
+        showLoading();
+        hideError();
+
+        try {
+          console.log("正在加载GeoJSON文件:", geoJsonFile);
+
+          const response = await fetch(geoJsonFile);
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP错误: ${response.status} - ${response.statusText}`
+            );
+          }
+
+          const geoJsonData = await response.json();
+          console.log("GeoJSON数据加载成功");
+
+          // 收集所有地区的评论数据
+          const commentCounts = [];
+          const regionsWithData = [];
+
+          geoJsonData.features.forEach((feature) => {
+            const count = feature.properties.count || 0;
+            commentCounts.push(count);
+            if (count > 0) {
+              regionsWithData.push({
+                name: feature.properties.name,
+                count: count,
+              });
+            }
+          });
+
+          console.log(
+            `总地区数: ${geoJsonData.features.length}, 有数据地区: ${regionsWithData.length}`
+          );
+
+          // 按评论数排序，显示数据分布
+          const sortedRegions = regionsWithData.sort(
+            (a, b) => b.count - a.count
+          );
+          console.log("评论数最多的前10个地区:", sortedRegions.slice(0, 10));
+
+          // 计算颜色分层
+          colorBreaks = calculateColorBreaks(commentCounts);
+
+          // 生成图例
+          generateLegend();
+
+          // 创建地图图层
+          geojson = L.geoJSON(geoJsonData, {
+            style: style,
+            onEachFeature: onEachFeature,
+          }).addTo(map);
+
+          // 验证颜色使用情况
+          console.log("验证颜色映射:");
+          const colorUsage = {};
+          geoJsonData.features.forEach((feature) => {
+            const count = feature.properties.count || 0;
+            const color = getColor(count);
+            colorUsage[color] = (colorUsage[color] || 0) + 1;
+
+            // 输出一些示例
+            if (count > 0) {
+              console.log(
+                `地区: ${feature.properties.name}, 评论数: ${count}, 颜色: ${color}`
+              );
+            }
+          });
+          console.log("各颜色使用统计:", colorUsage);
+
+          // 调整地图视图
+          map.fitBounds(geojson.getBounds());
+
+          hideLoading();
+          console.log("地图渲染完成");
+        } catch (error) {
+          console.error("加载GeoJSON数据失败:", error);
+          hideLoading();
+
+          let errorMessage = "加载地图数据失败";
+          if (
+            error.name === "TypeError" &&
+            error.message.includes("Failed to fetch")
+          ) {
+            errorMessage += "：无法获取数据文件，请检查文件是否存在";
+          } else if (error.name === "SyntaxError") {
+            errorMessage += "：数据格式错误";
+          } else {
+            errorMessage += "：" + error.message;
+          }
+
+          showError(errorMessage);
+        }
+      }
+
+      // 页面加载完成后开始加载数据
+      document.addEventListener("DOMContentLoaded", function () {
+        // 添加缩放控制按钮的中文提示
+        setTimeout(() => {
+          const zoomInBtn = document.querySelector(".leaflet-control-zoom-in");
+          const zoomOutBtn = document.querySelector(
+            ".leaflet-control-zoom-out"
+          );
+          if (zoomInBtn) zoomInBtn.title = "放大";
+          if (zoomOutBtn) zoomOutBtn.title = "缩小";
+        }, 100);
+
+        // 开始加载GeoJSON数据
+        loadGeoJsonData();
+      });
+    </script>
+  </body>
+</html>

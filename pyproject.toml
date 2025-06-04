@@ -1,0 +1,95 @@
+[tool.poetry]
+name = "bilibili-comments-analyzer"
+version = "1.0.0"
+description = "B站(哔哩哔哩 bilibili)评论数据分析器，提供完整的评论采集与可视化分析功能。支持单视频和UP主批量评论下载，具备评论地区分布地图生成、词云分析、图片提取等功能。内置智能反爬策略、多维度数据筛选、本地HTTP服务器等特性，为B站内容创作者、数据分析师和吃瓜群众提供强大的评论数据洞察工具。"
+authors = ["sansan"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+requests = "^2.31.0"
+httpx = "^0.28.1"
+pillow = "^11.2.1"
+qrcode = "^8.2"
+# pkuseg = "^0.0.25"
+spacy-pkuseg = "^1.0.0"
+cx-freeze = "^8.3.0"
+charset_normalizer = { extras = ["unicode-backport"], version = "^3.3.0" }
+brotli = "^1.1.0"
+
+
+[tool.poetry.scripts]
+bilibili-comments-analyzer = "run:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.cxfreeze]
+executables = [
+    { script = "run.py", target_name = "哔哩哔哩评论观察者.exe", base = "Win32GUI", icon = "assets/icon.ico" },
+]
+
+[tool.cxfreeze.build_exe]
+packages = [
+    "tkinter",
+    "tkinter.ttk",
+    "tkinter.scrolledtext",
+    "tkinter.filedialog",
+    "tkinter.messagebox",
+    "pathlib",
+    "re",
+    "json",
+    "csv",
+    "logging",
+    "threading",
+    "time",
+    "hashlib",
+    "urllib",
+    "urllib.parse",
+    "socket",
+    "webbrowser",
+    "http.server",
+    "http.client",
+    "socketserver",
+    "platform",
+    "subprocess",
+    "datetime",
+    "queue",
+    "requests",
+    "httpx",
+    "PIL",
+    "PIL.Image",
+    "PIL.ImageTk",
+    "qrcode",
+    "spacy_pkuseg",
+    "charset_normalizer",
+    "api",
+    "models",
+    "store",
+    "gui",
+    "config",
+    "utils",
+    "srsly",
+    "tempfile",
+    "shutil",
+    "sys",
+    "os",
+    "collections",
+    "typing",
+    "dataclasses",
+    "gzip",
+    "zlib",
+    "brotli", 
+]
+
+include_files = [
+    "assets/china-provinces.geojson",
+    "assets/map_template.html",
+    "assets/stopwords.txt",
+    "assets/wordcloud_template.html",
+    "assets/weixin.png",
+    "assets/icon.ico",
+    "assets/pkuseg/web",
+]
