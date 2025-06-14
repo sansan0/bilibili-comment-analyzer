@@ -596,6 +596,7 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
             "like",
             "rpid",
             "parent",
+            "ctime", 
         ]
         missing_fields = [field for field in required_fields if field not in fieldnames]
         if missing_fields:
@@ -655,7 +656,7 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
                 user_id = safe_get("mid", "0")
                 if not user_id or user_id == "":
                     user_id = "0"
-                user_id = str(user_id)  # 确保是字符串
+                user_id = str(user_id)
 
                 # 处理性别
                 sex = safe_get("sex", "保密")
@@ -686,6 +687,18 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
                     )
                     like = 0
 
+                # 处理评论时间
+                ctime_str = safe_get("ctime", "0")
+                try:
+                    ctime = int(float(ctime_str))
+                    if ctime < 0:
+                        ctime = 0
+                except (ValueError, TypeError):
+                    logger.debug(
+                        f"第{row_num}行: 评论时间'{ctime_str}'无法转换为整数，使用默认值0"
+                    )
+                    ctime = 0
+
                 # 处理rpid - 评论ID（仅用于内部计算）
                 rpid_str = safe_get("rpid", "0")
                 try:
@@ -709,7 +722,7 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
                 # 判断是否为回复
                 is_reply = parent_id != 0
 
-                # 收集实际存在的数据 - 确保等级是整数
+                # 收集实际存在的数据
                 regions_set.add(normalized_location)
                 genders_set.add(sex)
                 levels_set.add(level)  # 添加整数等级
@@ -727,6 +740,7 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
                     "sex": sex,
                     "level": level,
                     "like": like,
+                    "ctime": ctime, 
                     "mid": user_id,
                     "row_num": row_num,  # 临时保存行号用于调试
                 }
@@ -787,7 +801,6 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
             rpid = temp_comment["rpid"]
             reply_count = reply_counts.get(rpid, 0)
 
-            # 生成最终评论数据，移除rpid和parent_id字段
             final_comment = {
                 "content": temp_comment["content"],
                 "tokens": temp_comment["tokens"],
@@ -798,6 +811,7 @@ def analyze_csv_for_wordcloud(csv_file_path: str) -> Dict[str, Any]:
                 "sex": temp_comment["sex"],
                 "level": temp_comment["level"],
                 "like": temp_comment["like"],
+                "ctime": temp_comment["ctime"],
                 "mid": temp_comment["mid"],
             }
 
@@ -1021,7 +1035,6 @@ def generate_wordcloud_from_csv(csv_file_path: str, output_dir: str) -> bool:
             logger.error(f"详细错误: {traceback.format_exc()}")
             return False
 
-        # 生成HTML文件 - 使用实际标题或标识符
         html_file = output_dir_path / f"{filename}_wordcloud.html"
         try:
             logger.info(f"正在生成词云HTML文件: {html_file}")

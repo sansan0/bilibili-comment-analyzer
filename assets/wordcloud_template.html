@@ -222,11 +222,16 @@
         padding: 15px 20px;
         border-bottom: 1px solid #e9ecef;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 20px;
-        flex-wrap: wrap;
-        justify-content: space-between;
         flex-shrink: 0;
+      }
+
+      .control-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
       }
 
       .control-left {
@@ -240,6 +245,7 @@
         display: flex;
         align-items: center;
         gap: 25px;
+        flex-wrap: wrap;
       }
 
       .control-group {
@@ -288,6 +294,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
+
       .refresh-section {
         display: flex;
         flex-direction: column;
@@ -362,6 +369,7 @@
         padding: 12px 20px;
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        flex-wrap: wrap;
       }
 
       .stat-item {
@@ -479,7 +487,6 @@
         color: #e74c3c;
       }
 
-      /* 新增回复相关样式 */
       .reply-section {
         margin-bottom: 25px;
       }
@@ -539,6 +546,133 @@
         transform: translateX(20px);
       }
 
+      .copy-section-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: linear-gradient(135deg, #e8f4fd 0%, #c3cfe2 100%);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #bde0ff;
+        min-width: 180px;
+        max-width: 200px;
+        height: fit-content;
+        align-self: flex-start;
+      }
+
+      .copy-title-panel {
+        font-size: 0.85em;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 2px;
+      }
+
+      .copy-controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .sort-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .sort-label-panel {
+        font-size: 0.75em;
+        font-weight: 500;
+        color: #2c3e50;
+        white-space: nowrap;
+      }
+
+      .sort-select-panel {
+        padding: 3px 6px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.7em;
+        background: white;
+        min-width: 60px;
+      }
+
+      .copy-options-compact {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 6px 8px;
+        background: rgba(52, 152, 219, 0.08);
+        border-radius: 4px;
+        border: 1px solid rgba(52, 152, 219, 0.15);
+      }
+
+      .copy-option-checkbox {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.7em;
+        color: #2c3e50;
+        user-select: none;
+        gap: 4px;
+      }
+
+      .copy-option-checkbox input {
+        transform: scale(0.85);
+        margin: 0;
+      }
+
+      .copy-option-checkbox:hover {
+        color: #3498db;
+      }
+
+      .copy-btn-panel {
+        width: 100%;
+        background: linear-gradient(45deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.75em;
+        transition: all 0.3s ease;
+      }
+
+      .copy-btn-panel:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+      }
+
+      .copy-btn-panel:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .copy-result-panel {
+        padding: 4px 6px;
+        border-radius: 3px;
+        font-size: 0.65em;
+        text-align: center;
+        transition: all 0.3s ease;
+        width: 100%;
+        line-height: 1.2;
+      }
+
+      .copy-result-panel.success {
+        background: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(39, 174, 96, 0.3);
+      }
+
+      .copy-result-panel.error {
+        background: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
       /* 响应式设计 */
       @media (max-width: 1200px) {
         .container {
@@ -549,10 +683,6 @@
         .content {
           flex-direction: column;
           height: auto;
-        }
-        .refresh-section {
-          flex-direction: row;
-          gap: 12px;
         }
 
         .sidebar {
@@ -569,7 +699,19 @@
           gap: 12px;
         }
 
-        .control-left,
+        .control-main {
+          order: 1;
+        }
+
+        .copy-section-panel {
+          max-width: none;
+          min-width: 160px;
+        }
+
+        .control-left {
+          justify-content: center;
+        }
+
         .control-right {
           justify-content: center;
         }
@@ -617,6 +759,18 @@
         .filter-options {
           max-height: 120px;
         }
+
+        .copy-section-panel {
+          min-width: 140px;
+        }
+        .copy-options-compact {
+          flex-direction: column;
+          gap: 4px;
+          padding: 4px 6px;
+        }
+        .copy-option-checkbox {
+          font-size: 0.65em;
+        }
       }
     </style>
   </head>
@@ -650,6 +804,7 @@
           </div>
 
           <div class="sidebar-content">
+            <!-- 地区筛选 -->
             <div class="filter-section">
               <div class="filter-title">
                 地区筛选
@@ -658,6 +813,7 @@
               <div class="filter-options" id="regionFilters"></div>
             </div>
 
+            <!-- 性别筛选 -->
             <div class="filter-section">
               <div class="filter-title">
                 性别筛选
@@ -666,6 +822,7 @@
               <div class="filter-options" id="genderFilters"></div>
             </div>
 
+            <!-- 等级筛选 -->
             <div class="filter-section">
               <div class="filter-title">
                 等级筛选
@@ -674,6 +831,7 @@
               <div class="filter-options" id="levelFilters"></div>
             </div>
 
+            <!-- 回复筛选 -->
             <div class="reply-section">
               <div class="filter-title">
                 回复筛选
@@ -696,6 +854,7 @@
               </div>
             </div>
 
+            <!-- 表情统计 -->
             <div class="filter-section">
               <div class="filter-title">
                 表情统计
@@ -708,103 +867,152 @@
 
         <div class="main-content">
           <div class="control-panel">
-            <div class="control-left">
-              <div class="control-group">
-                <span class="control-label">最大词数:</span>
-                <input
-                  type="number"
-                  id="maxWords"
-                  class="control-input"
-                  value="100"
-                  min="10"
-                  max="500"
-                  title="词云中最多显示多少个高频词汇"
-                />
-                <span class="param-hint">词云显示词汇上限</span>
+            <!-- 左侧主要控制区域：上下两行 -->
+            <div class="control-main">
+              <!-- 上方：词云参数控制 -->
+              <div class="control-left">
+                <div class="control-group">
+                  <span class="control-label">最大词数:</span>
+                  <input
+                    type="number"
+                    id="maxWords"
+                    class="control-input"
+                    value="100"
+                    min="10"
+                    max="500"
+                    title="词云中最多显示多少个高频词汇"
+                  />
+                  <span class="param-hint">词云显示词汇上限</span>
+                </div>
+                <div class="control-group">
+                  <span class="control-label">最小词频:</span>
+                  <input
+                    type="number"
+                    id="minFreq"
+                    class="control-input"
+                    value="2"
+                    min="1"
+                    max="10"
+                    title="词汇至少出现多少次才会显示在词云中"
+                  />
+                  <span class="param-hint">过滤低频词汇</span>
+                </div>
+                <div class="control-group">
+                  <span class="control-label">词云形状:</span>
+                  <select
+                    id="wordcloudShape"
+                    class="control-select"
+                    title="选择词云的整体形状"
+                  >
+                    <option value="circle">圆形</option>
+                    <option value="cardioid">心形</option>
+                    <option value="diamond">菱形</option>
+                    <option value="triangle-forward">三角形</option>
+                    <option value="triangle">倒三角</option>
+                    <option value="pentagon">五边形</option>
+                    <option value="star">星形</option>
+                  </select>
+                </div>
               </div>
-              <div class="control-group">
-                <span class="control-label">最小词频:</span>
-                <input
-                  type="number"
-                  id="minFreq"
-                  class="control-input"
-                  value="2"
-                  min="1"
-                  max="10"
-                  title="词汇至少出现多少次才会显示在词云中"
-                />
-                <span class="param-hint">过滤低频词汇</span>
-              </div>
-              <div class="control-group">
-                <span class="control-label">词云形状:</span>
-                <select
-                  id="wordcloudShape"
-                  class="control-select"
-                  title="选择词云的整体形状"
-                >
-                  <option value="circle">圆形</option>
-                  <option value="cardioid">心形</option>
-                  <option value="diamond">菱形</option>
-                  <option value="triangle-forward">三角形</option>
-                  <option value="triangle">倒三角</option>
-                  <option value="pentagon">五边形</option>
-                  <option value="star">星形</option>
-                </select>
+
+              <!-- 下方：统计面板和刷新按钮 -->
+              <div class="control-right">
+                <div class="stats-panel">
+                  <div class="stat-item">
+                    <span class="stat-label">评论数</span>
+                    <span class="stat-value" id="statComments">0</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">用户数</span>
+                    <span class="stat-value" id="statUsers">0</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">点赞数</span>
+                    <span class="stat-value" id="statLikes">0</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">地区数</span>
+                    <span class="stat-value" id="statRegions">0</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">表情数</span>
+                    <span class="stat-value" id="statEmojis">0</span>
+                  </div>
+                </div>
+
+                <div class="refresh-section">
+                  <div class="auto-refresh-toggle">
+                    <label
+                      class="auto-refresh-switch"
+                      title="开启后，筛选区域变动 1 秒后自动生成词云"
+                    >
+                      <input
+                        type="checkbox"
+                        id="autoRefresh"
+                        checked
+                        onchange="handleAutoRefreshToggle()"
+                      />
+                      <span class="auto-switch-slider"></span>
+                    </label>
+                    <span
+                      class="auto-refresh-label"
+                      title="开启后，筛选区域变动 1 秒后自动生成词云"
+                      >自动刷新</span
+                    >
+                  </div>
+                  <button
+                    class="refresh-btn"
+                    onclick="generateWordcloud()"
+                    title="根据当前设置重新生成词云"
+                  >
+                    刷新词云
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="control-right">
-              <div class="stats-panel">
-                <div class="stat-item">
-                  <span class="stat-label">评论数</span>
-                  <span class="stat-value" id="statComments">0</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">用户数</span>
-                  <span class="stat-value" id="statUsers">0</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">点赞数</span>
-                  <span class="stat-value" id="statLikes">0</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">地区数</span>
-                  <span class="stat-value" id="statRegions">0</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">表情数</span>
-                  <span class="stat-value" id="statEmojis">0</span>
+            <!-- 右侧：复制功能面板 -->
+            <div class="copy-section-panel">
+              <div class="copy-title-panel">📋 复制筛选的评论</div>
+
+              <!-- 排序和选项 -->
+              <div class="copy-controls-row">
+                <div class="sort-group">
+                  <label for="sortBy" class="sort-label-panel">排序:</label>
+                  <select id="sortBy" class="sort-select-panel">
+                    <option value="time_desc">时间↓</option>
+                    <option value="time_asc">时间↑</option>
+                    <option value="like_desc">点赞↓</option>
+                    <option value="like_asc">点赞↑</option>
+                  </select>
                 </div>
               </div>
 
-              <div class="refresh-section">
-                <div class="auto-refresh-toggle">
-                  <label
-                    class="auto-refresh-switch"
-                    title="开启后，筛选区域变动 1 秒后自动生成词云"
-                  >
-                    <input
-                      type="checkbox"
-                      id="autoRefresh"
-                      checked
-                      onchange="handleAutoRefreshToggle()"
-                    />
-                    <span class="auto-switch-slider"></span>
-                  </label>
-                  <span
-                    class="auto-refresh-label"
-                    title="开启后，筛选区域变动 1 秒后自动生成词云"
-                    >自动刷新</span
-                  >
-                </div>
-                <button
-                  class="refresh-btn"
-                  onclick="generateWordcloud()"
-                  title="根据当前设置重新生成词云"
-                >
-                  刷新词云
-                </button>
+              <!-- 复制选项：横向排列 -->
+              <div class="copy-options-compact">
+                <label class="copy-option-checkbox">
+                  <input type="checkbox" id="includeLikes" checked />
+                  点赞
+                </label>
+                <label class="copy-option-checkbox">
+                  <input type="checkbox" id="includeTime" checked />
+                  时间
+                </label>
               </div>
+
+              <button
+                class="copy-btn-panel"
+                id="copyBtn"
+                onclick="copyCommentsToClipboard()"
+              >
+                复制到剪贴板
+              </button>
+
+              <div
+                class="copy-result-panel"
+                id="copyResult"
+                style="display: none"
+              ></div>
             </div>
           </div>
 
@@ -827,10 +1035,10 @@
       let selectedLevels = new Set();
       let includeReplies = true;
       let wordcloudChart = null;
-      let statsMode = "comments"; // 统计方式：comments, users, likes
+      let statsMode = "comments";
       let wordFrequencyCache = {};
-      let autoRefresh = true; // 自动刷新开关状态
-      let autoRefreshTimer = null; // 自动刷新定时器
+      let autoRefresh = true;
+      let autoRefreshTimer = null;
 
       // 数字动画效果
       function animateNumber(element, startValue, endValue, duration = 600) {
@@ -875,7 +1083,7 @@
         return emojiCount;
       }
 
-      // 计算统计数据 - 支持多种统计方式
+      // 计算统计数据
       function calculateStatistics() {
         const stats = {
           regions: new Map(),
@@ -883,9 +1091,7 @@
           levels: new Map(),
         };
 
-        // 根据统计方式计算不同的数据
         if (statsMode === "comments") {
-          // 按评论数统计
           allData.comments.forEach((comment) => {
             const region = comment.location;
             const gender = comment.sex;
@@ -898,7 +1104,6 @@
             }
           });
         } else if (statsMode === "users") {
-          // 按用户数统计
           const regionUsers = new Map();
           const genderUsers = new Map();
           const levelUsers = new Map();
@@ -909,19 +1114,16 @@
             const level = parseInt(comment.level);
             const userId = comment.mid;
 
-            // 地区用户去重
             if (!regionUsers.has(region)) {
               regionUsers.set(region, new Set());
             }
             regionUsers.get(region).add(userId);
 
-            // 性别用户去重
             if (!genderUsers.has(gender)) {
               genderUsers.set(gender, new Set());
             }
             genderUsers.get(gender).add(userId);
 
-            // 等级用户去重
             if (!isNaN(level)) {
               if (!levelUsers.has(level)) {
                 levelUsers.set(level, new Set());
@@ -930,7 +1132,6 @@
             }
           });
 
-          // 转换为计数
           regionUsers.forEach((users, region) => {
             stats.regions.set(region, users.size);
           });
@@ -941,7 +1142,6 @@
             stats.levels.set(level, users.size);
           });
         } else if (statsMode === "likes") {
-          // 按点赞数统计
           allData.comments.forEach((comment) => {
             const region = comment.location;
             const gender = comment.sex;
@@ -964,20 +1164,16 @@
         statsMode = document.getElementById("statsMode").value;
         console.log("统计方式改变为:", statsMode);
 
-        // 保存当前选中状态
         const currentSelectedRegions = new Set(selectedRegions);
         const currentSelectedGenders = new Set(selectedGenders);
         const currentSelectedLevels = new Set(selectedLevels);
 
-        // 重新初始化筛选器
         initializeFilters();
 
-        // 恢复选中状态
         selectedRegions = currentSelectedRegions;
         selectedGenders = currentSelectedGenders;
         selectedLevels = currentSelectedLevels;
 
-        // 重新应用选中状态到UI
         document
           .querySelectorAll(".filter-chip:not(.emoji-display)")
           .forEach((chip) => {
@@ -1015,7 +1211,6 @@
 
           console.log("原始数据:", data);
 
-          // 初始化图表
           const container = document.getElementById("wordcloud");
           wordcloudChart = echarts.init(container);
 
@@ -1033,7 +1228,6 @@
       function initializeFilters() {
         const stats = calculateStatistics();
 
-        // 获取总数用于计算百分比
         let totalCount = 0;
         if (statsMode === "comments") {
           totalCount = allData.comments.length;
@@ -1046,12 +1240,10 @@
           );
         }
 
-        // 清空现有筛选器
         document.getElementById("regionFilters").innerHTML = "";
         document.getElementById("genderFilters").innerHTML = "";
         document.getElementById("levelFilters").innerHTML = "";
 
-        // 地区筛选器 - 按统计值排序，前8个显示百分比
         const regionContainer = document.getElementById("regionFilters");
         const sortedRegions = Array.from(stats.regions.entries()).sort(
           (a, b) => b[1] - a[1]
@@ -1062,7 +1254,6 @@
             totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : "0.0";
 
           if (index < 8) {
-            // 前8名：显示百分比
             const chip = createPercentageFilterButton(
               region,
               "region",
@@ -1072,13 +1263,11 @@
             );
             regionContainer.appendChild(chip);
           } else {
-            // 其他地区：只显示地区名，悬停显示具体数值
             const chip = createSimpleFilterButton(region, "region", count);
             regionContainer.appendChild(chip);
           }
         });
 
-        // 性别筛选器 - 显示百分比
         const genderContainer = document.getElementById("genderFilters");
         allData.genders.forEach((gender) => {
           const count = stats.genders.get(gender) || 0;
@@ -1094,7 +1283,6 @@
           genderContainer.appendChild(chip);
         });
 
-        // 等级筛选器 - 显示百分比
         const levelContainer = document.getElementById("levelFilters");
         allData.levels.forEach((level) => {
           const levelInt = parseInt(level);
@@ -1111,11 +1299,9 @@
           levelContainer.appendChild(chip);
         });
 
-        // 表情统计显示（不可点击，仅展示）
         const emojiContainer = document.getElementById("emojiFilters");
         emojiContainer.innerHTML = "";
 
-        // 统计表情出现次数
         const emojiCount = countEmojisInComments(allData.comments);
         const sortedEmojis = Array.from(emojiCount.entries()).sort(
           (a, b) => b[1] - a[1]
@@ -1148,7 +1334,6 @@
       <div class="chip-percentage">${percentage}%</div>
     `;
 
-        // 根据统计方式设置不同的提示文本
         let unit = "";
         if (statsMode === "comments") {
           unit = "条评论";
@@ -1172,13 +1357,12 @@
         return chip;
       }
 
-      // 创建简单筛选按钮（只有文本）
+      // 创建简单筛选按钮
       function createSimpleFilterButton(text, type, count = null) {
         const chip = document.createElement("div");
         chip.className = "filter-chip simple";
         chip.textContent = text;
 
-        // 根据统计方式设置不同的提示文本
         let unit = "";
         if (statsMode === "comments") {
           unit = "条评论";
@@ -1212,12 +1396,10 @@
           "levelCount"
         ).textContent = `${selectedLevels.size}/${allData.levels.length}`;
 
-        // 回复筛选计数
         document.getElementById("replyCount").textContent = includeReplies
           ? "2/2"
           : "1/2";
 
-        // 表情统计
         const emojiCount = countEmojisInComments(
           filteredData.length ? filteredData : allData.comments
         );
@@ -1295,12 +1477,12 @@
           generateWordcloud();
         }
       }
+
       // 自动刷新开关处理
       function handleAutoRefreshToggle() {
         autoRefresh = document.getElementById("autoRefresh").checked;
         console.log("自动刷新开关状态:", autoRefresh ? "开启" : "关闭");
 
-        // 如果关闭自动刷新，清除现有定时器
         if (!autoRefresh && autoRefreshTimer) {
           clearTimeout(autoRefreshTimer);
           autoRefreshTimer = null;
@@ -1313,12 +1495,10 @@
           return;
         }
 
-        // 清除之前的定时器
         if (autoRefreshTimer) {
           clearTimeout(autoRefreshTimer);
         }
 
-        // 设置新的定时器，1秒后执行
         autoRefreshTimer = setTimeout(() => {
           console.log("自动刷新词云");
           generateWordcloud();
@@ -1378,11 +1558,10 @@
         generateWordcloud();
       }
 
-      // 更新筛选后的数据 - 优化版本
+      // 更新筛选后的数据
       function updateFilteredData() {
         const startTime = performance.now();
 
-        // 使用Map存储已处理的mid，提高查询效率
         const selectedRegionsMap = new Map();
         const selectedGendersMap = new Map();
         const selectedLevelsMap = new Map();
@@ -1401,7 +1580,6 @@
             return false;
           }
 
-          // 使用Map查找，提高性能
           const basicMatch =
             selectedRegionsMap.has(comment.location) &&
             selectedGendersMap.has(comment.sex) &&
@@ -1411,7 +1589,6 @@
             return false;
           }
 
-          // 回复筛选
           if (!includeReplies && comment.is_reply) {
             return false;
           }
@@ -1429,10 +1606,12 @@
           包含回复: includeReplies,
           处理时间: `${(performance.now() - startTime).toFixed(2)}ms`,
         });
+
+        updateCopyInfo();
         triggerAutoRefresh();
       }
 
-      // 更新统计信息（带动画）
+      // 更新统计信息
       function updateStatistics() {
         const uniqueUsers = new Set(filteredData.map((c) => c.mid));
         const uniqueRegions = new Set(filteredData.map((c) => c.location));
@@ -1492,7 +1671,7 @@
         );
       }
 
-      // 生成词云 - 直接使用预处理的tokens
+      // 生成词云
       function generateWordcloud() {
         const loadingEl = document.getElementById("loading");
 
@@ -1504,26 +1683,21 @@
         loadingEl.style.display = "flex";
         loadingEl.textContent = "正在生成词云...";
 
-        // 延迟执行以允许UI更新
         setTimeout(() => {
           try {
-            // 获取过滤后的评论
             if (filteredData.length === 0) {
               loadingEl.innerHTML = "没有符合条件的评论数据";
               return;
             }
 
-            // 获取配置
             const minFreq = parseInt(document.getElementById("minFreq").value);
             const maxWords = parseInt(
               document.getElementById("maxWords").value
             );
             const shape = document.getElementById("wordcloudShape").value;
 
-            // 生成缓存键
             const cacheKey = `${filteredData.length}_${minFreq}`;
 
-            // 检查缓存
             if (wordFrequencyCache[cacheKey]) {
               loadingEl.textContent = "使用缓存数据生成词云...";
               renderWordcloud(
@@ -1537,7 +1711,6 @@
 
             loadingEl.textContent = "正在统计词频...";
 
-            // 统计词频 - 直接使用预处理的tokens
             const wordCount = {};
             let totalTokens = 0;
 
@@ -1558,10 +1731,7 @@
               } 个唯一词`
             );
 
-            // 缓存结果
             wordFrequencyCache[cacheKey] = wordCount;
-
-            // 渲染词云
             renderWordcloud(wordCount, minFreq, maxWords, shape);
           } catch (error) {
             console.error("生成词云失败:", error);
@@ -1577,7 +1747,6 @@
 
         setTimeout(() => {
           try {
-            // 过滤并排序词汇
             const filteredWords = Object.entries(wordCount)
               .filter(([word, count]) => count >= minFreq)
               .sort((a, b) => b[1] - a[1])
@@ -1591,13 +1760,11 @@
               return;
             }
 
-            // 转换为词云数据格式
             const wordcloudData = filteredWords.map(([word, count]) => ({
               name: word,
               value: count,
             }));
 
-            // 设置词云选项
             const option = {
               tooltip: {
                 formatter: function (params) {
@@ -1656,7 +1823,6 @@
               ],
             };
 
-            // 设置图表选项
             wordcloudChart.setOption(option, true);
             loadingEl.style.display = "none";
 
@@ -1668,19 +1834,219 @@
         }, 0);
       }
 
+      // 复制功能相关变量和函数
+      let currentFilteredComments = [];
+
+      // 更新复制信息显示
+      function updateCopyInfo() {
+        const filteredComments = getFilteredComments();
+        currentFilteredComments = filteredComments;
+
+        const copyBtn = document.getElementById("copyBtn");
+
+        // 只需要控制按钮的启用/禁用状态，不再显示信息文本
+        if (filteredComments.length > 0) {
+          copyBtn.disabled = false;
+        } else {
+          copyBtn.disabled = true;
+        }
+      }
+
+      // 获取筛选后的评论
+      function getFilteredComments() {
+        if (!allData.comments) {
+          return [];
+        }
+
+        return allData.comments.filter((comment) => {
+          if (
+            selectedRegions.size > 0 &&
+            !selectedRegions.has(comment.location)
+          ) {
+            return false;
+          }
+
+          if (selectedGenders.size > 0 && !selectedGenders.has(comment.sex)) {
+            return false;
+          }
+
+          if (selectedLevels.size > 0 && !selectedLevels.has(comment.level)) {
+            return false;
+          }
+
+          if (!includeReplies && comment.is_reply) {
+            return false;
+          }
+
+          return true;
+        });
+      }
+
+      // 格式化时间戳为可读格式
+      function formatTimestamp(timestamp) {
+        if (!timestamp || timestamp === 0) {
+          return "未知时间";
+        }
+
+        try {
+          const date = new Date(timestamp * 1000);
+          return date.toLocaleString("zh-CN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+        } catch (error) {
+          console.error("时间格式化错误:", error);
+          return "时间格式错误";
+        }
+      }
+
+      // 复制评论到剪贴板
+      async function copyCommentsToClipboard() {
+        try {
+          const copyBtn = document.getElementById("copyBtn");
+          const copyResult = document.getElementById("copyResult");
+
+          copyBtn.textContent = "正在处理...";
+          copyBtn.disabled = true;
+          copyResult.style.display = "none";
+
+          let filteredComments = getFilteredComments();
+
+          if (filteredComments.length === 0) {
+            showCopyResult("没有符合条件的评论", "error");
+            return;
+          }
+
+          // 获取复制选项
+          const includeLikes = document.getElementById("includeLikes").checked;
+          const includeTime = document.getElementById("includeTime").checked;
+
+          const sortBy = document.getElementById("sortBy").value;
+
+          switch (sortBy) {
+            case "time_desc":
+              filteredComments.sort((a, b) => (b.ctime || 0) - (a.ctime || 0));
+              break;
+            case "time_asc":
+              filteredComments.sort((a, b) => (a.ctime || 0) - (b.ctime || 0));
+              break;
+            case "like_desc":
+              filteredComments.sort((a, b) => (b.like || 0) - (a.like || 0));
+              break;
+            case "like_asc":
+              filteredComments.sort((a, b) => (a.like || 0) - (b.like || 0));
+              break;
+            default:
+              filteredComments.sort((a, b) => (b.ctime || 0) - (a.ctime || 0));
+          }
+
+          // 计算序号位数用于补零
+          const totalCount = filteredComments.length;
+          const digits = totalCount.toString().length;
+
+          let copyText = "";
+          filteredComments.forEach((comment, index) => {
+            const serialNumber = (index + 1).toString().padStart(digits, "0");
+
+            // 处理评论内容
+            let content = comment.content || "无内容";
+            // 将 \n 替换为 " | "，你也可以选择其他替换符号
+            content = content.replace(/\n/g, " | ");
+
+            const likeCount = comment.like || 0;
+            const timeStr = formatTimestamp(comment.ctime);
+            const replyType = comment.is_reply ? "[回复]" : "[评论]";
+
+            let line = `${serialNumber}. ${replyType} ${content}`;
+
+            const extraInfo = [];
+            if (includeLikes) {
+              extraInfo.push(`点赞: ${likeCount}`);
+            }
+            if (includeTime) {
+              extraInfo.push(`时间: ${timeStr}`);
+            }
+
+            if (extraInfo.length > 0) {
+              line += ` (${extraInfo.join(", ")})`;
+            }
+
+            copyText += line + "\n";
+          });
+
+          copyText = copyText.trim();
+
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(copyText);
+            showCopyResult(
+              `已复制 ${filteredComments.length} 条评论到剪贴板`,
+              "success"
+            );
+          } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = copyText;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+              const success = document.execCommand("copy");
+              if (success) {
+                showCopyResult(
+                  `已复制 ${filteredComments.length} 条评论到剪贴板`,
+                  "success"
+                );
+              } else {
+                showCopyResult("复制失败：浏览器不支持", "error");
+              }
+            } catch (error) {
+              console.error("复制失败:", error);
+              showCopyResult("复制失败：" + error.message, "error");
+            } finally {
+              document.body.removeChild(textArea);
+            }
+          }
+        } catch (error) {
+          console.error("复制过程出错:", error);
+          showCopyResult("复制失败：" + error.message, "error");
+        } finally {
+          const copyBtn = document.getElementById("copyBtn");
+          copyBtn.textContent = "复制到剪贴板";
+          const filteredComments = getFilteredComments();
+          copyBtn.disabled = filteredComments.length === 0;
+        }
+      }
+
+      // 显示复制结果
+      function showCopyResult(message, type) {
+        const copyResult = document.getElementById("copyResult");
+        copyResult.textContent = message;
+        copyResult.className = `copy-result-panel ${type}`;
+        copyResult.style.display = "block";
+
+        setTimeout(() => {
+          copyResult.style.display = "none";
+        }, 3000);
+      }
+
       // 内存管理和资源释放
       window.addEventListener("beforeunload", function () {
-        // 清理缓存数据
         wordFrequencyCache = {};
 
-        // 清理图表实例
         if (wordcloudChart) {
           wordcloudChart.dispose();
           wordcloudChart = null;
         }
       });
 
-      // 节流函数，限制函数调用频率
+      // 节流函数
       function throttle(func, limit) {
         let inThrottle;
         return function () {
@@ -1694,7 +2060,6 @@
         };
       }
 
-      // 使用节流函数优化窗口调整大小时的重绘
       window.addEventListener(
         "resize",
         throttle(() => {
@@ -1704,7 +2069,6 @@
         }, 100)
       );
 
-      // 页面加载完成后加载数据
       document.addEventListener("DOMContentLoaded", loadData);
     </script>
   </body>
