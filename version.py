@@ -3,7 +3,7 @@
 统一管理应用程序的版本号和相关信息
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __app_name__ = "哔哩哔哩评论观察者"
 __app_name_en__ = "BiliBili Comment Analyzer"
 __author__ = "sansan"

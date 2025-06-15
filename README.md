@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/version-v1.0.0-green.svg)](https://github.com/sansan0/bilibili-comment-analyzer)
+[![Version](https://img.shields.io/badge/version-v1.1.0-green.svg)](https://github.com/sansan0/bilibili-comment-analyzer)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/sansan0/bilibili-comment-analyzer)
 
 </div>

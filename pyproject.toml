@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bilibili-comments-analyzer"
-version = "1.0.0"
+version = "1.1.0"
 description = "B站(哔哩哔哩 bilibili)评论数据分析器，提供完整的评论采集与可视化分析功能。支持单视频和UP主批量评论下载，具备评论地区分布地图生成、词云分析、图片提取等功能。内置智能反爬策略、多维度数据筛选、本地HTTP服务器等特性，为B站内容创作者、数据分析师和吃瓜群众提供强大的评论数据洞察工具。"
 authors = ["sansan"]
 readme = "README.md"
